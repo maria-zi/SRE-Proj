@@ -1,19 +1,19 @@
-apiVersion: apps/v1
+apiVersion: apps/v1  # Helm template для Deployment (использует Go-шаблоны)
 kind: Deployment
 metadata:
-  name: {{ include "telecom-chart.fullname" . }}
+  name: {{ include "telecom-chart.fullname" . }}      # имя из helper-функции
   labels:
-    {{- include "telecom-chart.labels" . | nindent 4 }}
+    {{- include "telecom-chart.labels" . | nindent 4 }}      # стандартные лейблы чарта
 spec:
-  {{- if not .Values.hpa.enabled }}
-  replicas: {{ .Values.replicaCount }}
+  {{- if not .Values.hpa.enabled }}       # если HPA отключён
+  replicas: {{ .Values.replicaCount }}          # использовать replicaCount
   {{- end }}
   selector:
     matchLabels:
-      {{- include "telecom-chart.selectorLabels" . | nindent 6 }}
+      {{- include "telecom-chart.selectorLabels" . | nindent 6 }}     # селектор
   template:
-    metadata:
-      {{- with .Values.podAnnotations }}
+    metadata: 
+      {{- with .Values.podAnnotations }}        # аннотации пода (если есть)
       annotations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
@@ -21,12 +21,12 @@ spec:
         {{- include "telecom-chart.selectorLabels" . | nindent 8 }}
     spec:
       containers:
-      - name: {{ .Chart.Name }}
-        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
-        imagePullPolicy: {{ .Values.image.pullPolicy }}
+      - name: {{ .Chart.Name }}        # имя из Chart.yaml
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"  # образ
+        imagePullPolicy: {{ .Values.image.pullPolicy }}          # policy
         ports:
         - name: http
-          containerPort: {{ .Values.service.port }}
+          containerPort: {{ .Values.service.port }}    # порт
           protocol: TCP
         livenessProbe:
           httpGet:
@@ -41,12 +41,12 @@ spec:
           initialDelaySeconds: 5
           periodSeconds: 3
         resources:
-          {{- toYaml .Values.resources | nindent 10 }}
+          {{- toYaml .Values.resources | nindent 10 }}      # ресурсы из values.yaml
         env:
         - name: DATABASE_URL
           valueFrom:
             secretKeyRef:
               name: telecom-secret
               key: database-url
-        - name: REDIS_HOST
-          value: {{ .Values.redis_host | default "redis" }}
+        - name: REDIS_HOST 
+          value: {{ .Values.redis_host | default "redis" }}       # или "redis" по умолчанию
