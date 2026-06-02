@@ -1,0 +1,42 @@
+replicaCount: 3
+
+image:
+  repository: telecom-api
+  tag: latest
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 80
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 200m
+    memory: 256Mi
+
+hpa:
+  enabled: true
+  minReplicas: 3
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 70
+
+postgresql:
+  enabled: true
+  global:
+    postgresqlDatabase: telecom
+    postgresqlUsername: telecom
+    postgresqlPassword: telecompass
+
+redis:
+  enabled: true
+
+ingress:
+  enabled: false
+  hosts:
+    - host: telecom.local
+      paths:
+        - path: /
+          pathType: Prefix
