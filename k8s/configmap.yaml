@@ -1,7 +1,7 @@
-apiVersion: v1
+apiVersion: v1 # ConfigMap — для хранения нечувствительных конфигов
 kind: ConfigMap
 metadata:
   name: telecom-config
-data:
-  redis-host: "redis"
-  log-level: "INFO"
+data:           # данные в виде ключ-значение
+  redis-host: "redis" # имя сервиса Redis в K8s
+  log-level: "INFO"       # уровень логирования
