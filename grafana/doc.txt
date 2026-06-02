@@ -38,3 +38,20 @@ High Latency	   p95 latency > 2 сек	      Warning
 Error Rate	     5xx errors > 5%	         Critical
 DB Connections	 Connections > 90% max	   Warning
 Disk Space	     Disk free < 10%	          Critical
+
+
+# 3. Установи зависимости
+cd telecom-system/app
+pip install -r requirements.txt
+
+
+# 6. Проверь метрики
+curl http://localhost:8000/metrics
+
+# Должно показать что-то вроде:
+# # HELP api_requests_total Total API requests
+# # TYPE api_requests_total counter
+# api_requests_total{method="GET",endpoint="/health",status="200"} 5
+# # HELP api_request_duration_seconds API request duration
+# # TYPE api_request_duration_seconds histogram
+# api_request_duration_seconds_bucket{method="GET",endpoint="/health",le="0.005"} 5
