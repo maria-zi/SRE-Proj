@@ -1,42 +1,42 @@
-replicaCount: 3
+replicaCount: 3 # Количество реплик (если HPA не включён)
 
-image:
-  repository: telecom-api
-  tag: latest
-  pullPolicy: IfNotPresent
+image:      # Конфигурация Docker образа
+  repository: telecom-api   # имя образа
+  tag: latest #последний
+  pullPolicy: IfNotPresent    # policy: если уже есть → не тянуть
 
-service:
-  type: ClusterIP
-  port: 80
+service:  # Конфигурация Service'а
+  type: ClusterIP  # тип: внутренний
+  port: 80   # порт
 
-resources:
+resources:   # Ресурсы (CPU/mem)
   requests:
-    cpu: 100m
-    memory: 128Mi
+    cpu: 100m       # мин CPU
+    memory: 128Mi      # мин память
   limits:
-    cpu: 200m
-    memory: 256Mi
+    cpu: 200m                 # макс CPU
+    memory: 256Mi            # макс память
 
-hpa:
-  enabled: true
+hpa:                    # HPA (автоскейлинг)
+  enabled: true            # включить HPA
   minReplicas: 3
   maxReplicas: 10
-  targetCPUUtilizationPercentage: 70
+  targetCPUUtilizationPercentage: 70       # целевая нагрузка CPU
 
-postgresql:
-  enabled: true
+postgresql:      # PostgreSQL (из зависимостей)
+  enabled: true        # установить PostgreSQL
   global:
     postgresqlDatabase: telecom
     postgresqlUsername: telecom
     postgresqlPassword: telecompass
 
-redis:
+redis: # установить Redis
   enabled: true
 
-ingress:
-  enabled: false
+ingress:      # Ingress
+  enabled: false   # отключить (включить для production с доменом)
   hosts:
-    - host: telecom.local
+    - host: telecom.local  # домен
       paths:
         - path: /
           pathType: Prefix
