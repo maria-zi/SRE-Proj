@@ -1,5 +1,5 @@
-{{- if .Values.hpa.enabled }}
-apiVersion: autoscaling/v2
+{{- if .Values.hpa.enabled }}       # Helm template для HPA (только если включён)   # условие: если hpa.enabled=true
+apiVersion: autoscaling/v2     
 kind: HorizontalPodAutoscaler
 metadata:
   name: {{ include "telecom-chart.fullname" . }}
@@ -9,7 +9,7 @@ spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: {{ include "telecom-chart.fullname" . }}
+    name: {{ include "telecom-chart.fullname" . }}     # Deployment для скейлинга
   minReplicas: {{ .Values.hpa.minReplicas }}
   maxReplicas: {{ .Values.hpa.maxReplicas }}
   metrics:
@@ -18,5 +18,5 @@ spec:
       name: cpu
       target:
         type: Utilization
-        averageUtilization: {{ .Values.hpa.targetCPUUtilizationPercentage }}
-{{- end }}
+        averageUtilization: {{ .Values.hpa.targetCPUUtilizationPercentage }} # процент из values.yaml
+{{- end }}  # конец условия
