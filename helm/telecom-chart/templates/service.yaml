@@ -1,15 +1,15 @@
-apiVersion: v1
+apiVersion: v1 # Helm template для Service
 kind: Service
 metadata:
-  name: {{ include "telecom-chart.fullname" . }}
+  name: {{ include "telecom-chart.fullname" . }}  # имя
   labels:
-    {{- include "telecom-chart.labels" . | nindent 4 }}
+    {{- include "telecom-chart.labels" . | nindent 4 }}    # лейблы
 spec:
-  type: {{ .Values.service.type }}
+  type: {{ .Values.service.type }}        # тип из values.yaml
   ports:
-    - port: {{ .Values.service.port }}
-      targetPort: http
+    - port: {{ .Values.service.port }}     # порт
+      targetPort: http             # targetPort
       protocol: TCP
       name: http
   selector:
-    {{- include "telecom-chart.selectorLabels" . | nindent 4 }}
+    {{- include "telecom-chart.selectorLabels" . | nindent 4 }}     # селектор
