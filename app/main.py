@@ -1,49 +1,48 @@
-# Импортируем FastAPI и зависимости
-from fastapi import FastAPI, Depends, HTTPException
-from sqlalchemy.orm import Session
-from sqlalchemy import text, func
-import redis
-import json
+from fastapi import FastAPI, Depends, HTTPException # Импортируем FastAPI приложение и Depends для DI (внедрение зависимостей)
+from sqlalchemy.orm import Session # Импортируем Session для работы с БД через SQLAlchemy
+from sqlalchemy import text, func # Импортируем text для сырых SQL-запросов и func для агрегатных функций (SUM, COUNT, AVG)
+import redis # Импортируем redis клиент для кэширования
+import json # Импортируем json для сериализации кэша
 import time  # Добавлено для метрик
 
-# Импортируем метрики Prometheus (НОВОЕ)
-from prometheus_client import Counter, Histogram, generate_latest, CONTENT_TYPE_LATEST
+
+from prometheus_client import Counter, Histogram, generate_latest, CONTENT_TYPE_LATEST # Импортируем метрики Prometheus 
 from starlette.responses import Response
 
-# Импортируем модели из models.py
-from models import Client, Service, Payment
-# Импортируем get_db и engine из database.py
-from database import get_db, engine
 
-# Создаём все таблицы в БД (если их нет) при запуске приложения
-Base.metadata.create_all(bind=engine)
+from models import Client, Service, Payment # Импортируем модели из models.py
 
-# Создаём FastAPI приложение
-# title = название API (показывается в Swagger UI)
-# version = версия API
-app = FastAPI(title="Telecom Client Management System", version="1.0.0")
+from database import get_db, engine # Импортируем get_db и engine из database.py
 
-# Создаём подключение к Redis (хост = имя сервиса в docker-compose/k8s)
-# decode_responses=True = возвращать строки вместо байтов
-redis_client = redis.Redis(host="redis", port=6379, decode_responses=True)
 
-# === МЕТРИКИ PROMETHEUS (НОВОЕ) ===
-# Счётчик запросов (ростёт с каждым запросом)
-REQUEST_COUNT = Counter(
+Base.metadata.create_all(bind=engine) # Создаём все таблицы в БД (если их нет) при запуске приложения
+
+
+
+
+app = FastAPI(title="Telecom Client Management System", version="1.0.0") # Создаём FastAPI приложение title = название API (показывается в Swagger UI) version = версия API
+
+
+
+redis_client = redis.Redis(host="redis", port=6379, decode_responses=True) # Создаём подключение к Redis (хост = имя сервиса в docker-compose/k8s) decode_responses=True = возвращать строки вместо байтов
+
+# === МЕТРИКИ PROMETHEUS  ===
+
+REQUEST_COUNT = Counter( # Счётчик запросов (растёт с каждым запросом)
     'api_requests_total',           # имя метрики
     'Total API requests',           # описание
     ['method', 'endpoint', 'status']  # лейблы (группировка)
 )
 
-# Гистограмма длительности запросов (p50, p95, p99)
-REQUEST_DURATION = Histogram(
+
+REQUEST_DURATION = Histogram( # Дительность запросов (p50, p95, p99)
     'api_request_duration_seconds',  # имя метрики
     'API request duration',          # описание
     ['method', 'endpoint']           # лейблы
 )
 
 
-# === MIDDLEWARE ДЛЯ СБОРА МЕТРИК (НОВОЕ) ===
+# === MIDDLEWARE ДЛЯ СБОРА МЕТРИК  ===
 @app.middleware("http")
 async def collect_metrics(request):
     # Начало запроса (записываем время)
