@@ -1,18 +1,19 @@
-apiVersion: networking.k8s.io/v1
+apiVersion: networking.k8s.io/v1      # Ingress — внешний роутинг (HTTP/S) в кластер
 kind: Ingress
 metadata:
   name: telecom-ingress
   annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/rewrite-target: /         # переписывать путь в root
 spec:
-  rules:
-  - host: telecom.local
+  rules:                         # правила роутинга
+  - host: telecom.local             # доменное имя (добавить в /etc/hosts)
     http:
       paths:
-      - path: /
-        pathType: Prefix
+      - path: /                      # все пути
+        pathType: Prefix                 # префиксное совпадение
         backend:
           service:
-            name: telecom-api
+            name: telecom-api                     # Service для бэкенда
             port:
-              number: 80
+              number: 80                            # порт Service'а
+     
