@@ -1,32 +1,32 @@
-apiVersion: networking.k8s.io/v1
+apiVersion: networking.k8s.io/v1   # NetworkPolicy — ограничение сетевого трафика между подами
 kind: NetworkPolicy
 metadata:
   name: telecom-api-network-policy
 spec:
   podSelector:
     matchLabels:
-      app: telecom-api
+      app: telecom-api        # к каким подам применять (только API)
   policyTypes:
-  - Ingress
-  - Egress
-  ingress:
+  - Ingress              # правила входящего трафика
+  - Egress                 # правила исходящего трафика
+  ingress:                 # входящий трафик (кто может подключаться к API)
   - from:
-    - podSelector:
+    - podSelector:           # только поды с этим лейблом
         matchLabels:
-          app: nginx
+          app: nginx            # только Nginx
     ports:
     - protocol: TCP
-      port: 8000
-  egress:
+      port: 8000                   # только порт 8000
+  egress:                           # исходящий трафик (к чему API может подключаться)
   - to:
-    - podSelector:
+    - podSelector:                  # к PostgreSQL
         matchLabels:
           app: postgres
     ports:
     - protocol: TCP
       port: 5432
   - to:
-    - podSelector:
+    - podSelector:                     # к Redis
         matchLabels:
           app: redis
     ports:
