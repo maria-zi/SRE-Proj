@@ -90,47 +90,50 @@ High-load телеком-система для управления клиент
 
 ---
 
-##  Структура репозитория
+## 📁 Структура репозитория
+
+```text
 telecom-system/
-── README.md                           # Этот файл
-── docker-compose.yml                  # Запуск локально (API + DB + Redis + Nginx)
-── docker-compose.monitoring.yml       # Запуск мониторинга (Prometheus + Grafana)
-── Dockerfile                          # Образ FastAPI приложения
-── nginx.conf                          # Конфиг Nginx (reverse proxy)
-
-── app/                                # FastAPI приложение
-   ── main.py                         # API endpoints + Prometheus metrics
-   ── models.py                       # SQLAlchemy модели (clients, services, payments)
-   ── database.py                     # Подключение к PostgreSQL
-   ── requirements.txt                # Python зависимости
-── k8s/                                # Kubernetes манифесты (без Helm)
-   ── deployment.yaml                 # Deployments (api, postgres, redis)
-   ── service.yaml                    # Services (ClusterIP)
-   ── hpa.yaml                        # HorizontalPodAutoscaler (3-10 реплик)
-   ── secret.yaml                     # Secrets (пароли БД)
-   ── configmap.yaml                  # ConfigMap (REDIS_HOST, log-level)
-   ── networkpolicy.yaml              # NetworkPolicy (запрет трафика между подами)
-   ── ingress.yaml                    # Ingress (внешний роутинг)
-   ── pvc.yaml                        # PersistentVolumeClaim (хранилище для PostgreSQL)
-
-── helm/                               # Helm Charts
-   ── telecom-chart/
-       ── Chart.yaml                  # Описание чарта + зависимости (PostgreSQL + Redis)
-       ── values.yaml                 # Значения по умолчанию (replicas, resources, HPA)
-       ── templates/
-           ── deployment.yaml         # Helm шаблон Deployment
-           ── service.yaml            # Helm шаблон Service
-           ── hpa.yaml                # Helm шаблон HPA
-
-── scripts/                            # Скрипты для запуска
-   ── setup.sh                        # Запуск локально (docker-compose)
-   ── k8s-setup.sh                    # Запуск в Kubernetes (kubectl apply)
-   ── helm-setup.sh                   # Запуск через Helm (helm upgrade --install)
-   ── start-monitoring.sh             # Запуск Prometheus + Grafana
-   ── backup.sh                       # Бэкап PostgreSQL (pg_dump + gzip)
-   ── healthcheck.sh                  # Проверка здоровья (статус, логи, контейнеры)
-
-── prometheus/                         # Конфигурация Prometheus
+├── README.md                           # Этот файл
+├── docker-compose.yml                  # Запуск локально (API + DB + Redis + Nginx)
+├── docker-compose.monitoring.yml       # Запуск мониторинга (Prometheus + Grafana)
+├── Dockerfile                          # Образ FastAPI приложения
+├── nginx.conf                          # Конфиг Nginx (reverse proxy)
+│
+├── app/                                # FastAPI приложение
+│   ├── main.py                         # API endpoints + Prometheus metrics
+│   ├── models.py                       # SQLAlchemy модели (clients, services, payments)
+│   ├── database.py                     # Подключение к PostgreSQL
+│   └── requirements.txt                # Python зависимости
+│
+├── k8s/                                # Kubernetes манифесты (без Helm)
+│   ├── deployment.yaml                 # Deployments (api, postgres, redis)
+│   ├── service.yaml                    # Services (ClusterIP)
+│   ├── hpa.yaml                        # HorizontalPodAutoscaler (3-10 реплик)
+│   ├── secret.yaml                     # Secrets (пароли БД)
+│   ├── configmap.yaml                  # ConfigMap (REDIS_HOST, log-level)
+│   ├── networkpolicy.yaml              # NetworkPolicy (запрет трафика между подами)
+│   ├── ingress.yaml                    # Ingress (внешний роутинг)
+│   └── pvc.yaml                        # PersistentVolumeClaim (хранилище для PostgreSQL)
+│
+├── helm/                               # Helm Charts
+│   └── telecom-chart/
+│       ├── Chart.yaml                  # Описание чарта + зависимости (PostgreSQL + Redis)
+│       ├── values.yaml                 # Значения по умолчанию (replicas, resources, HPA)
+│       └── templates/
+│           ├── deployment.yaml         # Helm шаблон Deployment
+│           ├── service.yaml            # Helm шаблон Service
+│           └── hpa.yaml                # Helm шаблон HPA
+│
+├── scripts/                            # Скрипты для запуска
+│   ├── setup.sh                        # Запуск локально (docker-compose)
+│   ├── k8s-setup.sh                    # Запуск в Kubernetes (kubectl apply)
+│   ├── helm-setup.sh                   # Запуск через Helm (helm upgrade --install)
+│   ├── start-monitoring.sh             # Запуск Prometheus + Grafana
+│   ├── backup.sh                       # Бэкап PostgreSQL (pg_dump + gzip)
+│   └── healthcheck.sh                  # Проверка здоровья (статус, логи, контейнеры)
+│
+├── prometheus/                         # Конфигурация Prometheus
 │   └── prometheus.yml                  # Scrape configs (api, postgres, node, cadvisor)
 │
 ├── grafana/                            # Конфигурация Grafana
@@ -144,8 +147,7 @@ telecom-system/
 │
 └── docs/
     └── sql_optimization.md             # Руководство по оптимизации SQL (EXPLAIN, индексы, CTE)
-
-
+```
 ---
 
 ##  API Endpoints
