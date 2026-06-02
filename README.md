@@ -1,10 +1,10 @@
-# 📱 Telecom Client Management System
+#  Telecom Client Management System
 
 High-load телеком-система для управления клиентами, услугами и платежами с полным CI/CD, Kubernetes-деплоем, Helm-чартами и мониторингом (Prometheus + Grafana).
 
 ---
 
-## 📋 Оглавление
+##  Оглавление
 
 - [О проекте](#-о-проекте)
 - [Архитектура системы](#-архитектура-системы)
@@ -22,27 +22,27 @@ High-load телеком-система для управления клиент
 
 ---
 
-## 🎯 О проекте
+##  О проекте
 
 Проект реализует **полноценную телеком-систему** с:
 
-- ✅ **REST API** на FastAPI (Python)
-- ✅ **PostgreSQL** база данных с сложными SQL-запросами (CTE, оконные функции, агрегации)
-- ✅ **Redis** кэширование для high-load (кэш ответов API на 5 минут)
-- ✅ **Nginx** реверс-прокси с балансировкой
-- ✅ **Docker** контейнеризация всего стека
-- ✅ **Kubernetes** деплой (Deployments, Services, HPA, NetworkPolicy, Ingress)
-- ✅ **Helm Charts** (Umbrella chart с зависимостями PostgreSQL + Redis)
-- ✅ **CI/CD** GitHub Actions (тесты, линтинг, автоматический деплой)
-- ✅ **Monitoring** Prometheus + Grafana (метрики API, CPU, память, PostgreSQL)
-- ✅ **Security** NetworkPolicy, Secret, Resource limits
-- ✅ **Documentation** Swagger UI, SQL optimization guide
+-  **REST API** на FastAPI (Python)
+-  **PostgreSQL** база данных с сложными SQL-запросами (CTE, оконные функции, агрегации)
+-  **Redis** кэширование для high-load (кэш ответов API на 5 минут)
+-  **Nginx** реверс-прокси с балансировкой
+-  **Docker** контейнеризация всего стека
+-  **Kubernetes** деплой (Deployments, Services, HPA, NetworkPolicy, Ingress)
+-  **Helm Charts** (Umbrella chart с зависимостями PostgreSQL + Redis)
+-  **CI/CD** GitHub Actions (тесты, линтинг, автоматический деплой)
+-  **Monitoring** Prometheus + Grafana (метрики API, CPU, память, PostgreSQL)
+-  **Security** NetworkPolicy, Secret, Resource limits
+-  **Documentation** Swagger UI, SQL optimization guide
 
 **Use case:** Управление клиентами телеком-компании, их услугами, платежами, расчёт долга, TOP-10 клиентов по тратам, ежедневная выручка.
 
 ---
 
-## 🏗️ Архитектура системы
+##  Архитектура системы
 ┌─────────────────────────────────────────────────────────────────┐
 │ USER (Браузер) │
 └────────────────────────────┬────────────────────────────────────┘
@@ -93,7 +93,7 @@ text
 
 ---
 
-## 🛠️ Стек технологий
+##  Стек технологий
 
 | Категория | Технология | Версия | Назначение |
 |-----------|------------|--------|------------|
@@ -114,7 +114,7 @@ text
 
 ---
 
-## 📁 Структура репозитория
+##  Структура репозитория
 telecom-system/
 ── README.md                           # Этот файл
 ── docker-compose.yml                  # Запуск локально (API + DB + Redis + Nginx)
@@ -172,7 +172,7 @@ telecom-system/
 
 ---
 
-## 🔌 API Endpoints
+##  API Endpoints
 
 | Method | Endpoint | Описание | Пример |
 |--------|----------|----------|--------|
@@ -188,9 +188,9 @@ telecom-system/
 
 ---
 
-## 🚀 Как запустить
+##  Как запустить
 
-### 📦 Локально (Docker Compose)
+###  Локально (Docker Compose)
 
 **Самый простой способ** — одна команда:
 
@@ -235,7 +235,7 @@ curl http://localhost:8000/clients
 
 ---
 
-### 📊 С мониторингом (Prometheus + Grafana)
+###  С мониторингом (Prometheus + Grafana)
 
 ```bash
 # 1. Сначала запусти основное приложение
@@ -267,7 +267,7 @@ curl http://localhost:8000/clients
 
 ---
 
-### ☸️ В Kubernetes (Minikube)
+###  В Kubernetes (Minikube)
 
 ```bash
 # 1. Установи Minikube (если нет)
@@ -305,7 +305,7 @@ kubectl describe hpa telecom-api-hpa -n telecom
 
 ---
 
-### 🛠️ Через Helm
+###  Через Helm
 
 ```bash
 # 1. Установи Helm (если нет)
@@ -449,17 +449,17 @@ kubectl get networkpolicy -n telecom
 
 ---
 
-## 📈 SQL Оптимизация
+##  SQL Оптимизация
 
 Подробная инструкция в **`docs/sql_optimization.md`**:
 
-- ✅ **EXPLAIN ANALYZE** — как читать план выполнения
-- ✅ **Индексы** — когда создавать, составные, частичные
-- ✅ **CTE** — проблемы материализации, как переписать в подзапрос
-- ✅ **Оконные функции** — ROW_NUMBER(), RANK(), SUM() OVER()
-- ✅ **Материализованные view** — кэширование дорогих агрегаций
-- ✅ **Партиционирование** — для таблиц >1 млн строк
-- ✅ **Мониторинг** — pg_stat_statements, горячие запросы
+-  **EXPLAIN ANALYZE** — как читать план выполнения
+-  **Индексы** — когда создавать, составные, частичные
+-  **CTE** — проблемы материализации, как переписать в подзапрос
+-  **Оконные функции** — ROW_NUMBER(), RANK(), SUM() OVER()
+-  **Материализованные view** — кэширование дорогих агрегаций
+-  **Партиционирование** — для таблиц >1 млн строк
+-  **Мониторинг** — pg_stat_statements, горячие запросы
 
 **Пример оптимизации:**
 
@@ -476,7 +476,7 @@ EXPLAIN (ANALYZE) SELECT * FROM clients WHERE phone = '89001234567';
 
 ---
 
-## 🔧 Troubleshooting
+##  Troubleshooting
 
 ### docker-compose: command not found
 
