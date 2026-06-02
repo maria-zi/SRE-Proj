@@ -4,3 +4,4 @@ sqlalchemy==2.0.25      #ORM для работы с базой данных (Pyt
 psycopg2-binary==2.9.9       #драйвер для подключения к PostgreSQL
 redis==5.0.1       #клиент для Redis (кэширование ответов API)
 pydantic==2.5.3       #валидация данных и схемы для FastAPI (request/response)
+prometheus-client==0.17.0  # библиотека для метрик Prometheus
