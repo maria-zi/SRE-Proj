@@ -1,0 +1,13 @@
+# Авто-провайзинг DataSource (подключение к Prometheus)
+apiVersion: 1
+
+datasources:
+  - name: Prometheus
+    type: prometheus
+    access: proxy
+    url: http://prometheus:9090  # URL Prometheus в Docker сети
+    isDefault: true  # DataSource по умолчанию
+    editable: true   # можно редактивать в UI
+    jsonData:
+      httpMethod: POST
+      timeInterval: "15s"  # интервал запросов
