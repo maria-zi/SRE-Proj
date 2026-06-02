@@ -1,15 +1,15 @@
-apiVersion: v2
-name: telecom-chart
+apiVersion: v2 # API версия Helm (v2 = Helm 3)
+name: telecom-chart  # Имя чарта
 description: "Umbrella Helm chart for Telecom Client Management System"
-type: application
-version: 0.1.0
-appVersion: "1.0.0"
-dependencies:
-  - name: postgresql
+type: application  # Тип: application (не library)
+version: 0.1.0  # Версия чарта (следует SemVer)
+appVersion: "1.0.0"  # Версия приложения
+dependencies:  # Зависимости (другие чарты, которые устанавливаются вместе)
+  - name: postgresql   # чарт Bitnami PostgreSQL
     repository: "https://charts.bitnami.com/bitnami"
     version: 12.1.0
-    condition: postgresql.enabled
-  - name: redis
+    condition: postgresql.enabled  # устанавливать только если 
+  - name: redis  # чарт Bitnami Redis
     repository: "https://charts.bitnami.com/bitnami"
     version: 17.1.0
     condition: redis.enabled
