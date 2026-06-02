@@ -1,0 +1,15 @@
+apiVersion: v2
+name: telecom-chart
+description: "Umbrella Helm chart for Telecom Client Management System"
+type: application
+version: 0.1.0
+appVersion: "1.0.0"
+dependencies:
+  - name: postgresql
+    repository: "https://charts.bitnami.com/bitnami"
+    version: 12.1.0
+    condition: postgresql.enabled
+  - name: redis
+    repository: "https://charts.bitnami.com/bitnami"
+    version: 17.1.0
+    condition: redis.enabled
