@@ -1,36 +1,36 @@
-version: '3.8'
+version: '3.8' # Версия формата docker-compose
 
-services:
-  app:
-    build: .
+services: # Список сервисов (контейнеров)
+  app: # Сервис API (FastAPI приложение)
+    build: . # Сборка из Dockerfile в текущей директории
     ports:
-      - "8000:8000"
-    depends_on:
+      - "8000:8000" # Проброс портов: 8000 на хосте → 8000 в контейнере
+    depends_on:  # Зависимости (ждем запуска db и redis перед app)
       - db
       - redis
-    environment:
+    environment:  # Переменные окружения (DATABASE_URL для подключения к PostgreSQL)
       - DATABASE_URL=postgresql://telecom:telecompass@db:5432/telecom
 
-  db:
-    image: postgres:15
-    environment:
-      POSTGRES_DB: telecom
-      POSTGRES_USER: telecom
-      POSTGRES_PASSWORD: telecompass
-    volumes:
-      - pgdata:/var/lib/postgresql/data
+  db:   # Сервис PostgreSQL (база данных)
+    image: postgres:15 # Образ PostgreSQL версии 15
+    environment:  # Переменные окружения для инициализации БД
+      POSTGRES_DB: telecom  # имя базы данных
+      POSTGRES_USER: telecom  # пользователь
+      POSTGRES_PASSWORD: telecompass # пароль
+    volumes: # Тома (volumes) для персистентности данных (данные не исчезнут после перезапуска)
+      - pgdata:/var/lib/postgresql/data # том pgdata → папка в контейнере
 
-  redis:
-    image: redis:alpine
+  redis:   # Сервис Redis (кэш)
+    image: redis:alpine   # Образ Redis alpine (лёгкий)
 
-  nginx:
-    image: nginx:alpine
+  nginx: # Сервис Nginx (реверс-прокси)
+    image: nginx:alpine # Образ Nginx alpine
     ports:
-      - "80:80"
-    volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf:ro
-    depends_on:
+      - "80:80"  # Проброс портов: 80 на хосте → 80 в контейнере
+    volumes:   # Монтируем конфиг nginx.conf из текущей директории
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro  # :ro = только чтение
+    depends_on: # Зависит от app (ждем запуска API)
       - app
 
-volumes:
-  pgdata:
+volumes: # Тома (volumes) — персистентное хранилище
+  pgdata: # том для PostgreSQL данных
