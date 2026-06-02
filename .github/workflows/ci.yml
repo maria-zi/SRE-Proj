@@ -1,63 +1,69 @@
-name: CI/CD with Kubernetes
+name: CI/CD with Kubernetes  # Имя workflow (показывается в GitHub Actions)
 
-on:
-  push:
+on:  # Триггеры запуска workflow
+  push:  # При push в ветки [main]
     branches: [main]
-  pull_request:
+  pull_request:  # При pull request в ветки [main]
     branches: [main]
 
-jobs:
-  test:
-    runs-on: ubuntu-latest
+jobs:  # Jobs (задачи) workflow
+  test:  # Job 1: test — тестирование и линтинг
+    runs-on: ubuntu-latest    # ОС runner'а (виртуальная машина GitHub)
     
-    steps:
-      - uses: actions/checkout@v4
+    steps:  # Шаги job'а
+      - uses: actions/checkout@v4   # Шаг 1: checkout репозитория
       
-      - name: Set up Python
+      - name: Set up Python    # Шаг 2: установка Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.11'
-          cache: 'pip'
+          python-version: '3.11'  # версия Python
+          cache: 'pip'     # кэширование pip dependencies
       
-      - name: Install dependencies
+      - name: Install dependencies  # Шаг 3: установка зависимостейм  основные зависимости тесты и линтери
         run: |
-          pip install -r app/requirements.txt
-          pip install pytest pytest-cov flake8
+          pip install -r app/requirements.txt  
+          pip install pytest pytest-cov flake8  ## 
       
-      - name: Run lint
+      - name: Run lint  # Шаг 4: запуск линтера (flake8) # --count = количество ошибок  --select=E9,F63,F7,F82 = только критичные ошибки --show-source = показать код ошибки --statistics = статистика
         run: |
           flake8 app/ --count --select=E9,F63,F7,F82 --show-source --statistics
+         
+          
       
-      - name: Helm lint
+      - name: Helm lint  # Шаг 5: линтинг Helm чарта Проверяем чарт на ошибки (если helm не установлен → пропускаем)
         run: |
           helm lint helm/telecom-chart || echo "Helm not installed, skipping"
       
-      - name: Build Docker
+      - name: Build Docker   # Шаг 6: сборка Docker образа   -t = тег (имя:версия)
         run: |
           docker build -t telecom-api:test .
 
-  deploy:
-    needs: test
-    runs-on: ubuntu-latest
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+  deploy:    # Job 2: deploy — деплой в Kubernetes (только после успешного test)
+    needs: test  # Зависимость от test (публикуется только если test прошёл)
+    runs-on: ubuntu-latest    # ОС runner'а
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'     # Условие: деплой только при push в main (не при PR)
     
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4 # Шаг 1: checkout
       
-      - name: Set up kubectl
+      - name: Set up kubectl  # Шаг 2: установка kubectl
         uses: azure/setup-kubectl@v3
       
-      - name: Set up Helm
+      - name: Set up Helm   # Шаг 3: установка Helm
         uses: azure/setup-helm@v3
       
-      - name: Deploy to Kubernetes
+      - name: Deploy to Kubernetes   # Шаг 4: деплой в Kubernetes через Helm # upgrade --install = обновить если существует, иначе установить
+            # --namespace = namespace в K8s
+            # --create-namespace = создать namespace если нет
+            # --set image.tag=latest = переопределить значение в values.yaml
         run: |
           helm upgrade --install telecom ./helm/telecom-chart \
             --namespace telecom \
             --create-namespace \
             --set image.tag=latest
+            
       
-      - name: Verify deployment
+      - name: Verify deployment # Шаг 5: проверка деплоя # показать все поды в namespace # показать HPA
         run: |
           kubectl get pods -n telecom
           kubectl get hpa -n telecom
