@@ -3,6 +3,7 @@ Telecom Client Management System
 High-load телеком-система для управления клиентами, услугами и платежами с полным CI/CD, Kubernetes-деплоем, Helm-чартами и мониторингом (Prometheus + Grafana).
 
 📋 Оглавление
+
 О проекте
 
 Архитектура системы
@@ -29,7 +30,6 @@ SQL Optimization
 
 Troubleshooting
 
-Автор
 
 🎯 О проекте
 Проект реализует полноценную телеком-систему с:
