@@ -1,0 +1,50 @@
+# Глобальная конфигурация Prometheus
+global:
+  # Как часто собирать метрики (по умолчанию 15 секунд)
+  scrape_interval: 15s
+  # Таймаут на сбор метрик
+  scrape_timeout: 10s
+  # Оценивать метрики каждые 15 секунд
+  evaluation_interval: 15s
+
+# Alertmanager (если нужны алерты)
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: []
+
+# Правила записи (recording rules)
+rule_files: []
+
+# Конфигурация scrape (откуда собирать метрики)
+scrape_configs:
+  # Prometheus сам себя мониторит
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # Мониторинг FastAPI приложения (нужен prometheus-client в Python)
+  - job_name: 'telecom-api'
+    static_configs:
+      - targets: ['app:8000']
+    # Метрики будут в /metrics endpoint (добавить в main.py)
+
+  # PostgreSQL Exporter
+  - job_name: 'postgresql'
+    static_configs:
+      - targets: ['postgres-exporter:9187']
+
+  # Node Exporter (хост)
+  - job_name: 'node'
+    static_configs:
+      - targets: ['node-exporter:9100']
+
+  # cAdvisor (Docker контейнеры)
+  - job_name: 'cadvisor'
+    static_configs:
+      - targets: ['cadvisor:8080']
+
+  # Grafana (сама себя мониторит)
+  - job_name: 'grafana'
+    static_configs:
+      - targets: ['grafana:3000']
