@@ -1,61 +1,61 @@
-apiVersion: apps/v1
+apiVersion: apps/v1  # Deployment для API (3 реплики)
 kind: Deployment
 metadata:
-  name: telecom-api
+  name: telecom-api  # имя Deployment'а
   labels:
-    app: telecom-api
+    app: telecom-api  # лейбл для селектора
 spec:
-  replicas: 3
+  replicas: 3  # 3 пода одновременно (high availability)
   selector:
     matchLabels:
-      app: telecom-api
+      app: telecom-api   # какие поды выбирать (по лейблу)
   template:
     metadata:
       labels:
-        app: telecom-api
+        app: telecom-api  # лейбл пода (должен совпадать с selector)
     spec:
       containers:
-      - name: telecom-api
-        image: telecom-api:latest
+      - name: telecom-api   # имя контейнера
+        image: telecom-api:latest  # Docker образ
         ports:
-        - containerPort: 8000
+        - containerPort: 8000  # порт внутри контейнера
         resources:
           requests:
-            memory: "128Mi"
-            cpu: "100m"
+            memory: "128Mi"   # минимальная память (гарантируется)
+            cpu: "100m"    # минимальная CPU (100m = 0.1 CPU)
           limits:
-            memory: "256Mi"
-            cpu: "200m"
-        livenessProbe:
+            memory: "256Mi"    # максимальная память (hard limit)
+            cpu: "200m"    # максимальная CPU
+        livenessProbe:    # проверка живости (если не проходит → перезапуск пода)
           httpGet:
-            path: /health
+            path: /health    # путь для health check
             port: 8000
-          initialDelaySeconds: 10
-          periodSeconds: 5
-        readinessProbe:
+          initialDelaySeconds: 10    # ждать 10 сек перед первой проверкой
+          periodSeconds: 5     # проверять каждые 5 сек
+        readinessProbe:     # готовность (если не проходит — не включать в Service)
           httpGet:
             path: /health
             port: 8000
           initialDelaySeconds: 5
           periodSeconds: 3
-        env:
-        - name: DATABASE_URL
+        env:                            # переменные окружения
+        - name: DATABASE_URL         # имя переменной
           valueFrom:
-            secretKeyRef:
+            secretKeyRef:                # берём из Secret
               name: telecom-secret
               key: database-url
         - name: REDIS_HOST
           valueFrom:
-            configMapKeyRef:
+            configMapKeyRef:               # берём из ConfigMap
               name: telecom-config
               key: redis-host
 ---
-apiVersion: apps/v1
+apiVersion: apps/v1      # Deployment для PostgreSQL (1 реплика)
 kind: Deployment
 metadata:
   name: postgres
 spec:
-  replicas: 1
+  replicas: 1         # одна база (главное — не реплицировать без настройки)
   selector:
     matchLabels:
       app: postgres
@@ -68,7 +68,7 @@ spec:
       - name: postgres
         image: postgres:15
         ports:
-        - containerPort: 5432
+        - containerPort: 5432        # стандартный порт PostgreSQL
         env:
         - name: POSTGRES_DB
           value: telecom
@@ -82,15 +82,15 @@ spec:
             secretKeyRef:
               name: telecom-secret
               key: db-password
-        volumeMounts:
+        volumeMounts:             # монтирование тома
         - name: pgdata
           mountPath: /var/lib/postgresql/data
-      volumes:
+      volumes:                           # определение тома
       - name: pgdata
-        persistentVolumeClaim:
-          claimName: postgres-pvc
+        persistentVolumeClaim:         # используем PVC
+          claimName: postgres-pvc          # имя PVC (из pvc.yaml)
 ---
-apiVersion: apps/v1
+apiVersion: apps/v1          # Deployment для Redis (1 реплика)
 kind: Deployment
 metadata:
   name: redis
@@ -108,4 +108,4 @@ spec:
       - name: redis
         image: redis:alpine
         ports:
-        - containerPort: 6379
+        - containerPort: 6379         # стандартный порт Redis
