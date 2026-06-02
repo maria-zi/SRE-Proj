@@ -1,0 +1,112 @@
+version: '3.8'
+
+# Сеть для мониторинга (отдельная от основного приложения)
+networks:
+  monitoring:
+    driver: bridge
+
+services:
+  # Prometheus — сбор метрик
+  prometheus:
+    image: prom/prometheus:v2.45.0
+    container_name: prometheus
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus  # персистентное хранилище
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=15d'  # хранить 15 дней
+      - '--web.enable-lifecycle'  # возможность перезагрузить конфиг без рестарта
+    ports:
+      - "9090:9090"  # доступ к UI Prometheus
+    networks:
+      - monitoring
+    restart: unless-stopped
+
+  # Grafana — визуализация
+  grafana:
+    image: grafana/grafana:10.0.0
+    container_name: grafana
+    volumes:
+      - grafana-data:/var/lib/grafana  # дашборды и настройки
+      - ./grafana/provisioning:/etc/grafana/provisioning  # авто-провайзинг
+    environment:
+      # Логин/пароль для входа в Grafana
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=telecompass
+      # Разрешить анонимный доступ (для безопасности убрать в production)
+      - GF_AUTH_ANONYMOUS_ENABLED=false
+      # Область по умолчанию
+      - GF_USERS_DEFAULT_THEME=light
+    ports:
+      - "3000:3000"  # доступ к UI Grafana
+    networks:
+      - monitoring
+    depends_on:
+      - prometheus
+    restart: unless-stopped
+
+  # PostgreSQL Exporter — метрики PostgreSQL
+  postgres-exporter:
+    image: quay.io/prometheuscommunity/postgres-exporter:v0.14.0
+    container_name: postgres-exporter
+    environment:
+      # Подключение к PostgreSQL
+      - POSTGRES_USER=telecom
+      - POSTGRES_PASSWORD=telecompass
+      - POSTGRES_DB=telecom
+      - POSTGRES_HOST=db  # имя сервиса PostgreSQL в docker-compose
+      - POSTGRES_PORT=5432
+      # Сбор дополнительных метрик
+      - PG_EXPORTER_DISABLE_DEFAULT_METRICS=false
+      - PG_EXPORTER_ENABLE.setting_METRICS=true
+    ports:
+      - "9187:9187"  # порт exporter'а
+    networks:
+      - monitoring
+    depends_on:
+      - db  # ждать запуска PostgreSQL
+    restart: unless-stopped
+
+  # Node Exporter — метрики хоста (CPU, память, диск)
+  node-exporter:
+    image: prom/node-exporter:v1.6.0
+    container_name: node-exporter
+    volumes:
+      - /proc:/host/proc:ro  # прочитать /proc хоста
+      - /sys:/host/sys:ro    # прочитать /sys хоста
+      - /:/rootfs:ro         # корневая ФС (для fs metrics)
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.sysfs=/host/sys'
+      - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
+    ports:
+      - "9100:9100"
+    networks:
+      - monitoring
+    restart: unless-stopped
+
+  # cAdvisor — метрики Docker контейнеров
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:v0.47.0
+    container_name: cadvisor
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+      - /dev/disk/:/dev/disk:ro
+    ports:
+      - "8081:8080"
+    networks:
+      - monitoring
+    privileged: true  # нужны привилегии для доступа к Docker API
+    restart: unless-stopped
+
+# Тома для персистентности
+volumes:
+  prometheus-data:
+  grafana-data:
