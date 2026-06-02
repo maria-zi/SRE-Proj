@@ -1,10 +1,10 @@
-apiVersion: v1
+apiVersion: v1    # PersistentVolumeClaim — запрос хранилища для PostgreSQL
 kind: PersistentVolumeClaim
 metadata:
   name: postgres-pvc
 spec:
   accessModes:
-    - ReadWriteOnce
+    - ReadWriteOnce                    # мониторинг одним узлом (одиночный write)
   resources:
     requests:
-      storage: 1Gi
+      storage: 1Gi                      # запрос 1 ГБ хранилища
