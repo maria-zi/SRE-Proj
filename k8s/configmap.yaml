@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: telecom-config
+data:
+  redis-host: "redis"
+  log-level: "INFO"
